@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">TP1</string>
+    <string name="labelPseudo">Pseudo</string>
+    <string name="labelAddList">Nouvelle Liste</string>
+    <string name="labelAddItem">Nouvel Item</string>
+    <string name="btnOK">OK</string>
+</resources>

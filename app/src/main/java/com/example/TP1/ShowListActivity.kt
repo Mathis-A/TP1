@@ -3,13 +3,18 @@ package com.example.TP1
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.example.TP1.api.DataProvider
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 
 class ShowListActivity: AppCompatActivity(), View.OnClickListener, OnItemClickListener {
 
@@ -18,6 +23,7 @@ class ShowListActivity: AppCompatActivity(), View.OnClickListener, OnItemClickLi
     private lateinit var newItem: EditText
 
     private lateinit var nom: String
+    private lateinit var hash: String
 
     private lateinit var getJson: String
     private lateinit var gson: Gson
@@ -25,8 +31,9 @@ class ShowListActivity: AppCompatActivity(), View.OnClickListener, OnItemClickLi
     private lateinit var sp: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
 
-    private lateinit var liste: ListeToDo
+    private lateinit var liste_items: MutableList<ItemToDo>
     private lateinit var recyclerView: RecyclerView
+    private val activityScope = CoroutineScope(IO)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,20 +44,28 @@ class ShowListActivity: AppCompatActivity(), View.OnClickListener, OnItemClickLi
         showOK.setOnClickListener(this)
 
 
-        val bdl = this.intent.extras
-        pseudo = bdl!!.getString("pseudo")!!
-        nom = bdl.getString("nom_liste")!!.replace(" ", "_")
-
         sp = PreferenceManager.getDefaultSharedPreferences(this)
         editor = sp.edit()
         getJson = sp.getString(Pair(pseudo, nom).toString(),
             "{\"nom\": $nom\", \"items\": []}").toString()
 
         gson = Gson()
-        liste = gson.fromJson(getJson, ListeToDo::class.java)
 
-        recyclerView = findViewById(R.id.item_recycler_view)
-        recyclerView.adapter = ItemAdapter(liste.items, this)
+        val id=this.intent.getStringExtra("id").toString()
+
+        val dataProvider = DataProvider(this)
+
+        activityScope.launch{
+            try {
+                hash = sp.getString("hash", "").toString()
+                liste_items = dataProvider.getItems(id, hash)
+                recyclerView = findViewById(R.id.item_recycler_view)
+                recyclerView.adapter = ItemAdapter(liste_items,this@ShowListActivity)
+            } catch (e:Exception) {
+                Log.d("PMR", e.toString())
+            }
+        }
+
 
     }
 
@@ -58,23 +73,23 @@ class ShowListActivity: AppCompatActivity(), View.OnClickListener, OnItemClickLi
         when (v.id) {
             R.id.item_button -> {
                 // ajout item
-                liste.items.add(ItemToDo(newItem.text.toString()))
+                liste_items.add(ItemToDo(liste_items.size.toString(),newItem.text.toString()))
 
-                getJson = gson.toJson(liste)
+                getJson = gson.toJson(liste_items)
                 editor.putString(Pair(pseudo, nom).toString(), getJson)
                 editor.commit()
 
-                recyclerView.adapter = ItemAdapter(liste.items, this)
+                recyclerView.adapter = ItemAdapter(liste_items, this)
             }
         }
     }
 
     override fun onItemClicked(v: View, pos: Int) {
         val checkBox = v as CheckBox
-        val item = liste.items[pos]
+        val item = liste_items[pos]
         item.fait = checkBox.isChecked
 
-        getJson = gson.toJson(liste)
+        getJson = gson.toJson(liste_items)
         editor.putString(Pair(pseudo, nom).toString(), getJson)
         editor.commit()
 

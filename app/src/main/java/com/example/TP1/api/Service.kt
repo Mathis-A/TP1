@@ -1,14 +1,15 @@
 package com.example.TP1.api
 
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Path
+import retrofit2.Call
+import retrofit2.http.*
 
 interface APIService {
-    @GET("users?pseudo={pseudo}&pass={mdp}")
-    fun checkUser(@Path("pseudo") pseudo: String, @Path("mdp") mdp: String ): String
+    @POST("authenticate")
+    suspend fun checkUser(@Query("user") pseudo: String, @Query("password") mdp: String ): Response
 
+    @GET("lists")
+    suspend fun getListes(@Query("hash") hash:String): Response
 
-    @GET("users/2/lists")
-    fun getListes(): ListeToDoResponse
+    @GET("lists/{id}/items")
+    suspend fun getItems(@Path("id") id:String, @Query("hash") hash:String ) : Response
 }

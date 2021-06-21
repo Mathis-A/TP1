@@ -1,3 +1,3 @@
 package com.example.TP1
 
-data class ItemToDo(val description: String, var fait: Boolean = false)
+data class ItemToDo(var id: String, var description: String, var fait: Boolean = false)

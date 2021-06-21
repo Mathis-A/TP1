@@ -2,7 +2,9 @@ package com.example.TP1.api
 
 import android.content.Context
 import android.preference.PreferenceManager
+import com.example.TP1.ItemToDo
 import com.example.TP1.ListeToDo
+import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -21,11 +23,12 @@ class DataProvider(context: Context) {
     private val service = retrofit.create(APIService::class.java)
 
 
-    fun getListFromApi(): List<ListeToDo> {
-        return service.getListes().listes
-    }
+    suspend fun checkUserFromApi(user: String, mdp: String): String =
+        service.checkUser(user, mdp).hash
 
-    fun checkUserFromApi(user:String, mdp:String): String {
-        return service.checkUser(user,mdp).toString()
-    }
+    suspend fun getListFromApi(hash: String): List<ListeToDo> =
+        service.getListes(hash).lists.toList()
+
+    suspend fun getItems(id: String, hash: String): MutableList<ItemToDo> =
+        service.getItems(id, hash).items.toMutableList()
 }

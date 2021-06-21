@@ -15,10 +15,15 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.example.TP1.api.DataProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import java.io.*
+import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
+import kotlin.concurrent.thread
 import kotlin.jvm.Throws
 
 
@@ -31,6 +36,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var pref: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
     private lateinit var dataProvider: DataProvider
+    private val activityScope = CoroutineScope(IO)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +54,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         editor = pref.edit()
 
         dataProvider = DataProvider(this)
+
 
     }
 
@@ -81,7 +88,18 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 editor.putString("pseudo", edtPseudo.text.toString())
                 editor.commit()
 
-                var hash=dataProvider.checkUserFromApi(edtPseudo.text.toString(),edtMdp.text.toString())
+                activityScope.launch {
+                    try {
+                        val hash = dataProvider.checkUserFromApi(edtPseudo.text.toString(), edtMdp.text.toString())
+                        editor.putString("hash",hash)
+                        editor.commit()
+                        Log.i("PMR", hash)
+                    }catch (e: Exception){
+                        Log.e("PMR", e.stackTrace.toString())
+                    }
+
+                }
+
 
                 val bdl = Bundle()
                 bdl.putString("pseudo", edtPseudo.text.toString())

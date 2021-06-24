@@ -8,9 +8,9 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class DataProvider(context: Context) {
+class DataProvider() {
 
-    val sp = PreferenceManager.getDefaultSharedPreferences(context)
+    private val sp = PreferenceManager.getDefaultSharedPreferences(context)
 
     private val BASE_URL = sp.getString("URL API", "http://tomnab.fr/todo-api/").toString()
 

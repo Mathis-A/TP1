@@ -66,6 +66,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             mainOK.setEnabled(true)
         }
 
+        // Laisser enabled pour pouvoir passer à la version hors ligne
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

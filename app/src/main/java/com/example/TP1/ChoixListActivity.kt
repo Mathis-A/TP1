@@ -11,6 +11,8 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.TP1.api.DataProvider
+import com.example.TP1.api.Repository
+import com.example.TP1.api.local.DataSource
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -30,7 +32,6 @@ class ChoixListActivity: AppCompatActivity(), View.OnClickListener, OnListClickL
     private lateinit var profil: ProfilListeToDo
     private lateinit var listes: List<ListeToDo>
     private lateinit var recyclerView: RecyclerView
-    private lateinit var dataProvider: DataProvider
     private val activityScope = CoroutineScope(IO)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,14 +41,19 @@ class ChoixListActivity: AppCompatActivity(), View.OnClickListener, OnListClickL
         newList = findViewById(R.id.new_list)
         choixOK = findViewById(R.id.choix_OK)
         choixOK.setOnClickListener(this)
+        val repository by lazy { Repository.newInstance(application) }
         val bdl = this.intent.extras
         val hash= bdl?.getString("hash")
-        dataProvider = DataProvider(this)
+        val id = repository.dataSource.getUser(hash)
 
         activityScope.launch {
             try {
                 val hash = sp.getString("hash","").toString()
-                listes=dataProvider.getListFromApi(hash)
+                try {
+
+                    listes=repository.getList(hash,)
+                }
+
 
                 recyclerView = findViewById(R.id.recycler_view)
                 recyclerView.adapter = ListAdapter(listes, this@ChoixListActivity)

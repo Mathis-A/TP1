@@ -9,11 +9,10 @@ interface ItemToDoDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveOrUpdate(items: List<ItemToDo>)
 
-    //Récupérer l'item dans la table ITEM désignée par son id
-    @Query("SELECT * FROM ITEMTODO WHERE ID = :id")
+    @Query("")
     suspend fun getOneItem(id:String): ItemToDo
 
-    //Ajouter un item dans une liste
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addItems(item:ItemToDo)
 

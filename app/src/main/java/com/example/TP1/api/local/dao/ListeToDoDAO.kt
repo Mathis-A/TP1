@@ -9,6 +9,6 @@ interface ListeToDoDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveListe(listes: List<ListeToDo>)
 
-    @Query("SELECT * FROM ITEMTODO WHERE IDlist = :id")
+    @Query("")
     suspend fun getItems(id:String): List<ItemToDo>
 }

@@ -15,8 +15,8 @@ class DataSource (application: Application) {
     private val listeToDoDao = roomDatabase.listeToDoDao()
     private val itemToDoDao = roomDatabase.itemToDoDao()
 
-    suspend fun getLists(pseudo: String): MutableList<ListeToDo> {
-        return profilListeToDoDao.getListes(pseudo).toMutableList()
+    suspend fun getLists(id: String): MutableList<ListeToDo> {
+        return profilListeToDoDao.getListes(id).toMutableList()
     }
 
     suspend fun getItems(id: String): MutableList<ItemToDo> {
@@ -33,8 +33,8 @@ class DataSource (application: Application) {
         return listeToDoDao.saveListe(items)
     }
 
-    suspend fun saveOrUpdateItems(items: MutableList<ItemToDo>,idList: String) {
-        for (item in items) { item.id=idList }
+    suspend fun saveItems(items: MutableList<ItemToDo>, id: String) {
+        for (item in items) { item.id=id }
         return itemToDoDao.saveOrUpdate(items)
     }
 
